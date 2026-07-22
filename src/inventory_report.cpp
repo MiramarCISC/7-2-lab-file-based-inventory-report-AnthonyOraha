@@ -26,6 +26,11 @@ double calculateItemValue(const InventoryItem& item) {
 
 // Returns the number of records stored
 // Reads records in the format: sku name quantity price
+
+// Improvement: Using >> for currentName only reads one word. If an item name contains spaces, the input will not be stored correctly. Consider using getline() to allow multi-word item names.
+// Reads records in the format: sku name quantity price
+// Returns the number of records stored
+// Reads records in the format: sku name quantity price
 int readInventoryFile(string filename, InventoryItem items[], int maxItems) {
     ifstream inputFile(filename);
 
@@ -34,11 +39,28 @@ int readInventoryFile(string filename, InventoryItem items[], int maxItems) {
     }
 
     int count = 0;
-    string currentSku, currentName;
-    int currentQuantity;
-    double currentPrice;
+    string line;
 
-    while (count < maxItems && inputFile >> currentSku >> currentName >> currentQuantity >> currentPrice) {
+    while (count < maxItems && getline(inputFile, line)) {
+        stringstream ss(line);
+
+        string currentSku;
+        string currentName;
+        int currentQuantity;
+        double currentPrice;
+
+        ss >> currentSku;
+        ss >> currentName;
+        string word;
+        while (ss >> word) {
+            if (isdigit(word[0])) {
+                currentQuantity = stoi(word);
+                ss >> currentPrice;
+                break;
+            }
+            currentName += " " + word;
+        }
+
         items[count].sku = currentSku;
         items[count].name = currentName;
         items[count].quantity = currentQuantity;
@@ -53,6 +75,8 @@ int readInventoryFile(string filename, InventoryItem items[], int maxItems) {
 
 // Writes each item and its total value and the total inventory value
 // Returns true if the report was written successfully
+
+// Improvement: Add fixed and setprecision(2) formatting before writing prices and item values so they always display as currency with two decimal places.
 bool writeInventoryReport(string filename, const InventoryItem items[], int count) {
     ofstream outputFile(filename);
 
