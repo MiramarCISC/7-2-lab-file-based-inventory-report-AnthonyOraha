@@ -1,0 +1,4 @@
+A100 Apples Value: 15.00
+B200 Bread Value: 16.25
+C300 Cereal Value: 38.00
+Total inventory value: 69.25
